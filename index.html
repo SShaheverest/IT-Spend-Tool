@@ -6,211 +6,110 @@
 <title>IT Spend Estimation Tool</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; font-size: 13px; background: #f4f5f7; color: #222; min-height: 100vh; }
 
-  body {
-    font-family: Arial, sans-serif;
-    font-size: 13px;
-    background: #f4f5f7;
-    color: #222;
-    min-height: 100vh;
-  }
-
-  /* ── Header ── */
-  .hdr {
-    background: #1F2D40;
-    color: #fff;
-    padding: 14px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 8px rgba(0,0,0,.25);
-  }
-  .hdr-title { font-size: 16px; font-weight: 600; }
-  .hdr-sub   { font-size: 11px; color: #90afc5; margin-top: 2px; }
+  .hdr { background: #1F2D40; color: #fff; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .hdr-title { font-size: 16px; font-weight: 700; }
+  .hdr-sub   { font-size: 11px; color: #7fb3d3; margin-top: 3px; }
   .hdr-btns  { display: flex; gap: 8px; flex-wrap: wrap; }
 
-  /* ── Buttons ── */
-  .btn {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 6px 13px; border-radius: 6px; font-size: 12px;
-    font-weight: 600; cursor: pointer; border: none;
-    transition: opacity .15s;
-  }
-  .btn:hover { opacity: .85; }
+  .btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; border: none; transition: filter .15s; }
+  .btn:hover { filter: brightness(1.1); }
   .btn-blue  { background: #1A6FA8; color: #fff; }
   .btn-green { background: #1E6B4A; color: #fff; }
-  .btn-gray  { background: #2E4057; color: #fff; }
+  .btn-gray  { background: #3d5166; color: #fff; }
   .btn-sm    { padding: 4px 9px; font-size: 11px; }
 
-  /* ── Panels ── */
-  .panel {
-    background: #fff;
-    border: 1px solid #dde1e7;
-    border-radius: 8px;
-    margin: 10px 16px;
-    padding: 14px 16px;
-  }
-  .panel-title {
-    font-size: 11px; font-weight: 600; color: #666;
-    text-transform: uppercase; letter-spacing: .5px;
-    margin-bottom: 10px;
-  }
+  .panel { background: #fff; border: 1px solid #dde1e7; border-radius: 8px; margin: 10px 16px; padding: 14px 16px; }
+  .panel-title { font-size: 11px; font-weight: 700; color: #666; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; }
 
-  /* ── Benchmark grid ── */
   .bm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
-  .bm-card {
-    background: #f8f9fb; border: 1px solid #e2e5ea;
-    border-radius: 6px; padding: 8px 10px;
-  }
-  .bm-ind  { font-size: 11px; font-weight: 600; color: #1F2D40; margin-bottom: 2px; }
+  .bm-card { background: #f8f9fb; border: 1px solid #e2e5ea; border-radius: 6px; padding: 9px 11px; }
+  .bm-ind  { font-size: 11px; font-weight: 700; color: #1F2D40; margin-bottom: 2px; }
   .bm-base { font-size: 11px; color: #1A5276; font-weight: 700; margin-bottom: 4px; }
   .bm-ranges { display: flex; gap: 5px; }
-  .bm-val { font-size: 10px; padding: 2px 6px; border-radius: 4px; }
+  .bm-val  { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
   .bm-low  { background: #e8f5e9; color: #1b5e20; }
   .bm-mid  { background: #e3f2fd; color: #0d47a1; }
   .bm-high { background: #fff3e0; color: #e65100; }
 
-  /* ── Form ── */
-  .form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
-    gap: 10px; margin-bottom: 12px;
-  }
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 10px; margin-bottom: 12px; }
   .form-group { display: flex; flex-direction: column; gap: 4px; position: relative; }
-  .form-label { font-size: 11px; font-weight: 600; color: #555; }
-  .form-input {
-    padding: 7px 9px; border: 1px solid #ccc; border-radius: 6px;
-    font-size: 12px; width: 100%; background: #fff; color: #222;
-  }
+  .form-label { font-size: 11px; font-weight: 700; color: #555; }
+  .form-input { padding: 7px 9px; border: 1px solid #ccc; border-radius: 6px; font-size: 12px; width: 100%; background: #fff; color: #222; }
   .form-input:focus { outline: none; border-color: #1A6FA8; box-shadow: 0 0 0 2px rgba(26,111,168,.15); }
   .form-hint { font-size: 10px; color: #999; font-style: italic; }
 
-  /* ── Autocomplete ── */
-  .suggestions {
-    position: absolute; top: 100%; left: 0; right: 0;
-    background: #fff; border: 1px solid #ccc; border-radius: 6px;
-    z-index: 200; max-height: 170px; overflow-y: auto;
-    box-shadow: 0 4px 14px rgba(0,0,0,.14);
-  }
+  .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 6px; z-index: 200; max-height: 180px; overflow-y: auto; box-shadow: 0 4px 14px rgba(0,0,0,.15); }
   .suggest-item { padding: 7px 10px; font-size: 12px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
   .suggest-item:hover { background: #f0f6ff; }
   .suggest-item:last-child { border-bottom: none; }
 
-  /* ── Filters & stats ── */
-  .filters {
-    display: flex; gap: 10px; padding: 8px 16px;
-    background: #fff; border-bottom: 1px solid #e2e5ea;
-    align-items: center; flex-wrap: wrap;
-  }
-  .filter-label { font-size: 11px; color: #666; font-weight: 600; }
-  .filter-select {
-    padding: 5px 9px; border: 1px solid #ccc; border-radius: 5px;
-    font-size: 11px; background: #fff; color: #222;
-  }
+  .filters { display: flex; gap: 10px; padding: 9px 16px; background: #fff; border-bottom: 1px solid #e2e5ea; align-items: center; flex-wrap: wrap; }
+  .filter-label  { font-size: 11px; color: #555; font-weight: 700; }
+  .filter-select { padding: 5px 9px; border: 1px solid #ccc; border-radius: 5px; font-size: 11px; background: #fff; color: #222; cursor: pointer; }
 
   .stats-bar { display: flex; gap: 10px; padding: 10px 16px; flex-wrap: wrap; background: #f8f9fb; border-bottom: 1px solid #e2e5ea; }
-  .stat-card {
-    background: #fff; border: 1px solid #dde1e7;
-    border-radius: 6px; padding: 8px 14px; min-width: 115px;
-  }
-  .stat-val { font-size: 19px; font-weight: 700; color: #1F2D40; }
-  .stat-lbl { font-size: 10px; color: #888; margin-top: 2px; }
+  .stat-card { background: #fff; border: 1px solid #dde1e7; border-radius: 6px; padding: 9px 16px; min-width: 120px; }
+  .stat-val  { font-size: 20px; font-weight: 700; color: #1F2D40; }
+  .stat-lbl  { font-size: 10px; color: #888; margin-top: 2px; font-weight: 600; }
 
-  /* ── Formula note ── */
-  .formula-note {
-    font-size: 10px; color: #888; padding: 5px 16px 6px;
-    font-style: italic; border-bottom: 1px solid #e2e5ea;
-    background: #fafbfc; line-height: 1.7;
-  }
-  .formula-note strong { color: #444; font-style: normal; }
+  .formula-note { font-size: 10px; color: #888; padding: 6px 16px 7px; font-style: italic; border-bottom: 1px solid #e2e5ea; background: #fafbfc; line-height: 1.8; }
+  .formula-note strong { color: #555; font-style: normal; font-weight: 700; }
 
-  /* ── Table ── */
-  .tbl-wrap { overflow-x: auto; padding: 0 16px 20px; }
-  table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 1080px; }
+  .tbl-wrap { overflow-x: auto; padding: 0 16px 24px; }
+  table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 1100px; margin-top: 10px; }
 
-  thead th {
-    background: #1F2D40; color: #fff;
-    padding: 8px 8px; text-align: left; font-weight: 600;
-    white-space: nowrap; font-size: 10px; line-height: 1.4;
-    position: sticky; top: 54px;
-  }
-  thead th.r { text-align: right; }
+  thead th { background: #1F2D40; color: #fff; padding: 9px 8px; text-align: left; font-weight: 700; white-space: nowrap; font-size: 10px; line-height: 1.4; border-right: 1px solid #2e4057; }
+  thead th:last-child { border-right: none; }
+  thead th.r       { text-align: right; }
   thead th.adj-grp { background: #1A5276; }
 
-  tbody td {
-    padding: 6px 8px; border-bottom: 1px solid #eef0f3;
-    vertical-align: middle; white-space: nowrap;
-  }
+  tbody td { padding: 7px 8px; border-bottom: 1px solid #eef0f3; vertical-align: middle; white-space: nowrap; border-right: 1px solid #f5f5f5; }
+  tbody td:last-child { border-right: none; }
   tbody td.r { text-align: right; font-variant-numeric: tabular-nums; }
-  tbody tr:hover td { background: #f5f8ff; }
-  tbody tr.new-co td { background: #fffbf4; }
+  tbody tr:hover td   { background: #f4f8ff; }
+  tbody tr.new-co td  { background: #fffcf5; }
   tbody tr.new-co:hover td { background: #fff5e6; }
 
-  /* ── Badges ── */
-  .new-badge {
-    display: inline-block; padding: 1px 5px; border-radius: 3px;
-    font-size: 9px; background: #fff3e0; color: #e65100;
-    margin-left: 5px; vertical-align: middle; font-weight: 600;
-  }
+  .new-badge { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; background: #fff3e0; color: #e65100; margin-left: 5px; vertical-align: middle; font-weight: 700; }
 
-  /* ── Action buttons ── */
-  .edit-btn, .delete-btn {
-    background: none; border: none; cursor: pointer;
-    padding: 3px 5px; border-radius: 4px; font-size: 13px;
-    transition: background .12s;
-  }
-  .edit-btn   { color: #aaa; }
-  .edit-btn:hover   { color: #1A6FA8; background: #e8f0fe; }
-  .delete-btn { color: #ccc; }
-  .delete-btn:hover { color: #c0392b; background: #fde8e8; }
+  .edit-btn, .delete-btn { background: none; border: none; cursor: pointer; padding: 3px 5px; border-radius: 4px; font-size: 14px; }
+  .edit-btn   { color: #bbb; } .edit-btn:hover   { color: #1A6FA8; background: #e8f0fe; }
+  .delete-btn { color: #ccc; } .delete-btn:hover { color: #c0392b; background: #fde8e8; }
 
-  /* ── Inline edit inputs ── */
-  .inline-input {
-    padding: 3px 6px; border: 1px solid #1A6FA8; border-radius: 4px;
-    font-size: 11px; background: #fff; color: #222;
-  }
+  .inline-input { padding: 3px 6px; border: 1px solid #1A6FA8; border-radius: 4px; font-size: 11px; background: #fff; color: #222; }
 
-  /* ── Value colours ── */
-  .pos  { color: #1E6B4A; font-weight: 600; }
-  .neg  { color: #c0392b; font-weight: 600; }
-  .neu  { color: #999; }
-  .muted { color: #bbb; font-size: 10px; }
+  .pos       { color: #1E6B4A; font-weight: 700; }
+  .neg       { color: #c0392b; font-weight: 700; }
+  .neu       { color: #aaa; }
+  .muted     { color: #c0c4cc; font-size: 10px; }
   .base-col  { color: #1A5276; font-weight: 700; }
   .adj-final { color: #1A5276; font-weight: 700; }
-
-  /* ── Empty state ── */
-  .empty { text-align: center; padding: 48px; color: #aaa; font-size: 13px; }
+  .empty { text-align: center; padding: 50px; color: #bbb; font-size: 13px; }
 </style>
 </head>
 <body>
 
-<!-- Header -->
 <div class="hdr">
   <div>
     <div class="hdr-title">IT Spend Estimation Tool</div>
     <div class="hdr-sub">Benchmark-driven &middot; Growth-rate adjusted &middot; Original group averages locked &middot; No cap or floor</div>
   </div>
   <div class="hdr-btns">
-    <button class="btn btn-gray" onclick="toggleBm()">&#9776; Benchmarks</button>
-    <button class="btn btn-blue" onclick="toggleForm()">+ Add Company</button>
+    <button class="btn btn-gray"  onclick="toggleBm()">&#9776; Benchmarks</button>
+    <button class="btn btn-blue"  onclick="toggleForm()">+ Add Company</button>
     <button class="btn btn-green" onclick="exportCSV()">&#8595; Export CSV</button>
   </div>
 </div>
 
-<!-- Benchmark panel -->
 <div id="bm-panel" style="display:none" class="panel">
   <div class="panel-title">Industry benchmarks &mdash; Base % is the agreed starting point for each industry</div>
   <div class="bm-grid" id="bm-grid"></div>
 </div>
 
-<!-- Add company panel -->
 <div id="form-panel" style="display:none" class="panel">
-  <div class="panel-title">Add company &mdash; new companies form their own group average, separate from the original 34 accounts</div>
+  <div class="panel-title">Add company &mdash; new companies use all accounts in their industry for group average; original accounts are unaffected</div>
   <div class="form-grid">
     <div class="form-group" id="name-group">
       <label class="form-label">Company name</label>
@@ -242,7 +141,6 @@
   </div>
 </div>
 
-<!-- Filters -->
 <div class="filters">
   <span class="filter-label">Industry:</span>
   <select class="filter-select" id="fil-industry" onchange="render()"><option value="All">All industries</option></select>
@@ -252,30 +150,27 @@
     <option value="Original">Original accounts</option>
     <option value="New">Added companies</option>
   </select>
-  <span id="count-label" style="margin-left:auto;font-size:11px;color:#888;font-weight:600"></span>
+  <span id="count-label" style="margin-left:auto;font-size:11px;color:#888;font-weight:700"></span>
 </div>
 
-<!-- Stats bar -->
 <div class="stats-bar" id="stats-bar"></div>
 
-<!-- Formula note -->
 <div class="formula-note">
   <strong>Formula:</strong>&nbsp;
-  Group Avg = ROUND(AVERAGE(industry IT FTE growth rates), 4) &nbsp;|&nbsp;
+  Group Avg (original accounts) = ROUND(AVERAGE(originals in industry), 4) &nbsp;|&nbsp;
+  Group Avg (added companies) = ROUND(AVERAGE(all accounts in industry), 4) &nbsp;|&nbsp;
   Differential = IT FTE Growth &minus; Group Avg &nbsp;|&nbsp;
   Adjustment = Differential &times; 0.25 &nbsp;|&nbsp;
   Adj. Benchmark % = Base % + Adjustment &nbsp;|&nbsp;
-  Adj. IT Spend Est. = Revenue &times; Adj. Benchmark % &nbsp;|&nbsp;
-  &mdash; = standalone new company, no group average available
+  Adj. IT Spend Est. = Revenue &times; Adj. Benchmark %
 </div>
 
-<!-- Table -->
 <div class="tbl-wrap">
   <table>
     <thead>
       <tr>
         <th style="min-width:175px">Company</th>
-        <th style="min-width:110px">Industry</th>
+        <th style="min-width:115px">Industry</th>
         <th class="r">Revenue<br>($M)</th>
         <th class="r">Est. Low<br>($M)</th>
         <th class="r">Est. Mid<br>($M)</th>
@@ -287,7 +182,7 @@
         <th class="r">Adjustment<br>(25bps/1pp)</th>
         <th class="r adj-grp">Adj. Benchmark<br>%</th>
         <th class="r adj-grp" style="min-width:100px">Adj. IT Spend<br>Est. ($M)</th>
-        <th style="width:56px"></th>
+        <th style="width:58px"></th>
       </tr>
     </thead>
     <tbody id="tbl-body"></tbody>
@@ -296,390 +191,244 @@
 </div>
 
 <script>
-// ─── Benchmark data ────────────────────────────────────────────────────────────
 const BM = {
-  "Financial Services":              { low:.044, mid:.079, high:.114, base:.114 },
-  "Life Sciences & Health Care":     { low:.045, mid:.055, high:.075, base:.055 },
-  "Retail":                          { low:.020, mid:.025, high:.035, base:.020 },
-  "Automotive":                      { low:.020, mid:.030, high:.045, base:.030 },
-  "FMCG":                            { low:.015, mid:.020, high:.030, base:.030 },
-  "Energy, Resources & Industrials": { low:.014, mid:.027, high:.040, base:.027 },
-  "Telecom":                         { low:.050, mid:.085, high:.110, base:.085 },
-  "SaaS":                            { low:.150, mid:.200, high:.250, base:.200 },
-  "IDM (Integrated Device Mfg)":     { low:.025, mid:.035, high:.050, base:.025 }
+  "Financial Services":              {low:.044,mid:.079,high:.114,base:.114},
+  "Life Sciences & Health Care":     {low:.045,mid:.055,high:.075,base:.055},
+  "Retail":                          {low:.020,mid:.025,high:.035,base:.020},
+  "Automotive":                      {low:.020,mid:.030,high:.045,base:.030},
+  "FMCG":                            {low:.015,mid:.020,high:.030,base:.030},
+  "Energy, Resources & Industrials": {low:.014,mid:.027,high:.040,base:.027},
+  "Telecom":                         {low:.050,mid:.085,high:.110,base:.085},
+  "SaaS":                            {low:.150,mid:.200,high:.250,base:.200},
+  "IDM (Integrated Device Mfg)":     {low:.025,mid:.035,high:.050,base:.025}
 };
 const INDS = Object.keys(BM);
 
-// ─── Preset company data ───────────────────────────────────────────────────────
 const PRESETS = [
-  { n:"Bank of America Corporation",       ind:"Financial Services",             rev:113100, g:5   },
-  { n:"HSBC",                              ind:"Financial Services",             rev:68274,  g:2   },
-  { n:"Visa Inc.",                         ind:"Financial Services",             rev:40000,  g:2   },
-  { n:"Mastercard Incorporated",           ind:"Financial Services",             rev:32800,  g:6   },
-  { n:"Exxon Mobil Corporation",           ind:"Energy, Resources & Industrials",rev:332238, g:1   },
-  { n:"Siemens Corporation",               ind:"Energy, Resources & Industrials",rev:89263,  g:6   },
-  { n:"Shell USA Inc.",                    ind:"Energy, Resources & Industrials",rev:273700, g:9   },
-  { n:"Pfizer Inc.",                       ind:"Life Sciences & Health Care",    rev:62579,  g:1   },
-  { n:"AstraZeneca LP",                    ind:"Life Sciences & Health Care",    rev:58739,  g:4   },
-  { n:"Novartis AG",                       ind:"Life Sciences & Health Care",    rev:54532,  g:5   },
-  { n:"Kroger Co., The",                   ind:"Retail",                         rev:147642, g:5   },
-  { n:"Walmart Inc.",                      ind:"Retail",                         rev:680985, g:0,  base:.025 },
-  { n:"Target",                            ind:"Retail",                         rev:106566, g:2   },
-  { n:"Albertsons",                        ind:"Retail",                         rev:79000,  g:1   },
-  { n:"Toyota Motor North America, Inc.",  ind:"Automotive",                     rev:129100, g:5   },
-  { n:"Tesla, Inc.",                       ind:"Automotive",                     rev:94827,  g:13  },
-  { n:"General Motors",                    ind:"Automotive",                     rev:185019, g:0   },
-  { n:"Ford Motor Company",                ind:"Automotive",                     rev:187267, g:5   },
-  { n:"Hyundai",                           ind:"Automotive",                     rev:128400, g:6   },
-  { n:"Unilever PLC",                      ind:"FMCG",                           rev:57126,  g:4   },
-  { n:"P&G",                               ind:"FMCG",                           rev:84300,  g:0   },
-  { n:"Nestle",                            ind:"FMCG",                           rev:107986, g:12  },
-  { n:"L'Oreal",                           ind:"FMCG",                           rev:49840,  g:3   },
-  { n:"McDonald's Corporation",            ind:"FMCG",                           rev:26885,  g:19  },
-  { n:"Verizon Communications Inc.",       ind:"Telecom",                        rev:138191, g:-2  },
-  { n:"AT&T Inc.",                         ind:"Telecom",                        rev:125600, g:2   },
-  { n:"T-Mobile",                          ind:"Telecom",                        rev:71300,  g:4   },
-  { n:"Comcast",                           ind:"Telecom",                        rev:123707, g:1   },
-  { n:"Adobe Inc.",                        ind:"SaaS",                           rev:23769,  g:-6  },
-  { n:"Salesforce",                        ind:"SaaS",                           rev:37895,  g:-3  },
-  { n:"SAP",                               ind:"SaaS",                           rev:36800,  g:7   },
-  { n:"Samsung Electronics Co., Ltd.",     ind:"IDM (Integrated Device Mfg)",   rev:234622, g:11  },
-  { n:"LG Electronics",                    ind:"IDM (Integrated Device Mfg)",   rev:62000,  g:5   },
-  { n:"Intel",                             ind:"IDM (Integrated Device Mfg)",   rev:52900,  g:-2  }
+  {n:"Bank of America Corporation",ind:"Financial Services",rev:113100,g:5},
+  {n:"HSBC",ind:"Financial Services",rev:68274,g:2},
+  {n:"Visa Inc.",ind:"Financial Services",rev:40000,g:2},
+  {n:"Mastercard Incorporated",ind:"Financial Services",rev:32800,g:6},
+  {n:"Exxon Mobil Corporation",ind:"Energy, Resources & Industrials",rev:332238,g:1},
+  {n:"Siemens Corporation",ind:"Energy, Resources & Industrials",rev:89263,g:6},
+  {n:"Shell USA Inc.",ind:"Energy, Resources & Industrials",rev:273700,g:9},
+  {n:"Pfizer Inc.",ind:"Life Sciences & Health Care",rev:62579,g:1},
+  {n:"AstraZeneca LP",ind:"Life Sciences & Health Care",rev:58739,g:4},
+  {n:"Novartis AG",ind:"Life Sciences & Health Care",rev:54532,g:5},
+  {n:"Kroger Co., The",ind:"Retail",rev:147642,g:5},
+  {n:"Walmart Inc.",ind:"Retail",rev:680985,g:0,base:.025},
+  {n:"Target",ind:"Retail",rev:106566,g:2},
+  {n:"Albertsons",ind:"Retail",rev:79000,g:1},
+  {n:"Toyota Motor North America, Inc.",ind:"Automotive",rev:129100,g:5},
+  {n:"Tesla, Inc.",ind:"Automotive",rev:94827,g:13},
+  {n:"General Motors",ind:"Automotive",rev:185019,g:0},
+  {n:"Ford Motor Company",ind:"Automotive",rev:187267,g:5},
+  {n:"Hyundai",ind:"Automotive",rev:128400,g:6},
+  {n:"Unilever PLC",ind:"FMCG",rev:57126,g:4},
+  {n:"P&G",ind:"FMCG",rev:84300,g:0},
+  {n:"Nestle",ind:"FMCG",rev:107986,g:12},
+  {n:"L'Oreal",ind:"FMCG",rev:49840,g:3},
+  {n:"McDonald's Corporation",ind:"FMCG",rev:26885,g:19},
+  {n:"Verizon Communications Inc.",ind:"Telecom",rev:138191,g:-2},
+  {n:"AT&T Inc.",ind:"Telecom",rev:125600,g:2},
+  {n:"T-Mobile",ind:"Telecom",rev:71300,g:4},
+  {n:"Comcast",ind:"Telecom",rev:123707,g:1},
+  {n:"Adobe Inc.",ind:"SaaS",rev:23769,g:-6},
+  {n:"Salesforce",ind:"SaaS",rev:37895,g:-3},
+  {n:"SAP",ind:"SaaS",rev:36800,g:7},
+  {n:"Samsung Electronics Co., Ltd.",ind:"IDM (Integrated Device Mfg)",rev:234622,g:11},
+  {n:"LG Electronics",ind:"IDM (Integrated Device Mfg)",rev:62000,g:5},
+  {n:"Intel",ind:"IDM (Integrated Device Mfg)",rev:52900,g:-2}
 ];
 
-// ─── State ─────────────────────────────────────────────────────────────────────
-let companies = PRESETS.map((p, i) => ({
-  id: i + 1,
-  name: p.n,
-  industry: p.ind,
-  revenue: p.rev,
-  itFteGrowth: p.g,
-  baseOverride: p.base != null ? p.base : null,
-  isOriginal: true
-}));
-let editingId = null;
-let nextId = 200;
+let companies = PRESETS.map((p,i) => ({id:i+1,name:p.n,industry:p.ind,revenue:p.rev,itFteGrowth:p.g,baseOverride:p.base!=null?p.base:null,isOriginal:true}));
+let editingId=null, nextId=200;
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-function roundTo4(x) { return Math.round(x * 10000) / 10000; }
-function fmt(n)       { return Math.round(n).toLocaleString(); }
-function fmtP(n, d)   { return (n * 100).toFixed(d != null ? d : 2) + "%"; }
-function fmtG(n)      { return (n >= 0 ? "+" : "") + n.toFixed(2) + "%"; }
-function fmtAdj(n)    { return (n >= 0 ? "+" : "") + n.toFixed(4) + "%"; }
+function roundTo4(x){return Math.round(x*10000)/10000;}
+function fmt(n){return Math.round(n).toLocaleString();}
+function fmtP(n,d){return(n*100).toFixed(d!=null?d:2)+"%";}
+function fmtG(n){return(n>=0?"+":"")+n.toFixed(2)+"%";}
+function fmtAdj(n){return(n>=0?"+":"")+n.toFixed(4)+"%";}
 
-function calcGroupAvgs(subset) {
-  const avgs = {};
-  INDS.forEach(ind => {
-    const grp = subset.filter(c => c.industry === ind);
-    if (grp.length) {
-      const avg = grp.reduce((s, c) => s + (Number(c.itFteGrowth) || 0), 0) / grp.length;
-      avgs[ind] = roundTo4(avg / 100);
+function buildAvgMap(subset){
+  const map={};
+  INDS.forEach(ind=>{
+    const grp=subset.filter(c=>c.industry===ind);
+    if(grp.length){
+      const avg=grp.reduce((s,c)=>s+(Number(c.itFteGrowth)||0),0)/grp.length;
+      map[ind]=roundTo4(avg/100);
     } else {
-      avgs[ind] = 0;
+      map[ind]=0;
     }
   });
-  return avgs;
+  return map;
 }
 
-function calcAll() {
-  const originals = companies.filter(c => c.isOriginal);
-  const newCos    = companies.filter(c => !c.isOriginal);
-  const origAvgs  = calcGroupAvgs(originals);
+function calcAll(){
+  const origAvgs = buildAvgMap(companies.filter(c=>c.isOriginal));
+  const allAvgs  = buildAvgMap(companies);
 
-  const newAvgMap = {};
-  INDS.forEach(ind => {
-    const grp = newCos.filter(c => c.industry === ind);
-    if (grp.length > 1) {
-      const avg = grp.reduce((s, c) => s + (Number(c.itFteGrowth) || 0), 0) / grp.length;
-      newAvgMap[ind] = roundTo4(avg / 100);
-    } else {
-      newAvgMap[ind] = null;
-    }
-  });
+  return companies.map(c=>{
+    const bm=BM[c.industry]||BM["Financial Services"];
+    const rev=Number(c.revenue)||0;
+    const gDecimal=(Number(c.itFteGrowth)||0)/100;
+    const base=c.baseOverride!=null?c.baseOverride:bm.base;
+    const grpAvg=c.isOriginal?(origAvgs[c.industry]||0):(allAvgs[c.industry]||0);
 
-  return companies.map(c => {
-    const bm  = BM[c.industry] || BM["Financial Services"];
-    const rev = Number(c.revenue) || 0;
-    const gDecimal = (Number(c.itFteGrowth) || 0) / 100;
-    const base = c.baseOverride != null ? c.baseOverride : bm.base;
+    const estLow=rev*bm.low, estMid=rev*bm.mid, estHigh=rev*bm.high;
+    const diff=gDecimal-grpAvg;
+    const adjustment=diff*0.25;
+    const adjBm=base+adjustment;
+    const adjEst=rev*adjBm;
 
-    let grpAvg, standalone = false;
-    if (c.isOriginal) {
-      grpAvg = origAvgs[c.industry] || 0;
-    } else {
-      if (newAvgMap[c.industry] != null) {
-        grpAvg = newAvgMap[c.industry];
-      } else {
-        standalone = true;
-        grpAvg = null;
-      }
-    }
-
-    const estLow  = rev * bm.low;
-    const estMid  = rev * bm.mid;
-    const estHigh = rev * bm.high;
-
-    const diff       = standalone ? 0 : gDecimal - (grpAvg || 0);
-    const adjustment = standalone ? 0 : diff * 0.25;
-    const adjBm      = base + adjustment;
-    const adjEst     = rev * adjBm;
-
-    return { ...c, bm, estLow, estMid, estHigh, base, grpAvg, gDecimal, diff, adjustment, adjBm, adjEst, standalone };
-  }).sort((a, b) => b.revenue - a.revenue);
+    return{...c,bm,estLow,estMid,estHigh,base,grpAvg,gDecimal,diff,adjustment,adjBm,adjEst};
+  }).sort((a,b)=>b.revenue-a.revenue);
 }
 
-// ─── Render ───────────────────────────────────────────────────────────────────
-function render() {
-  const rows    = calcAll();
-  const filInd  = document.getElementById("fil-industry").value;
-  const filSet  = document.getElementById("fil-set").value;
-  const filtered = rows.filter(r => {
-    if (filInd !== "All" && r.industry !== filInd) return false;
-    if (filSet === "Original" && !r.isOriginal)    return false;
-    if (filSet === "New"      &&  r.isOriginal)    return false;
+function render(){
+  const rows=calcAll();
+  const filInd=document.getElementById("fil-industry").value;
+  const filSet=document.getElementById("fil-set").value;
+  const filtered=rows.filter(r=>{
+    if(filInd!=="All"&&r.industry!==filInd)return false;
+    if(filSet==="Original"&&!r.isOriginal)return false;
+    if(filSet==="New"&&r.isOriginal)return false;
     return true;
   });
 
-  document.getElementById("count-label").textContent = filtered.length + " companies";
+  document.getElementById("count-label").textContent=filtered.length+" companies";
 
-  const totalRev = filtered.reduce((s, r) => s + r.revenue, 0);
-  const totalAdj = filtered.reduce((s, r) => s + r.adjEst, 0);
-  const avgInt   = totalRev > 0 ? totalAdj / totalRev : 0;
+  const totalRev=filtered.reduce((s,r)=>s+r.revenue,0);
+  const totalAdj=filtered.reduce((s,r)=>s+r.adjEst,0);
+  const avgInt=totalRev>0?totalAdj/totalRev:0;
 
-  document.getElementById("stats-bar").innerHTML = `
+  document.getElementById("stats-bar").innerHTML=`
     <div class="stat-card"><div class="stat-val">${filtered.length}</div><div class="stat-lbl">Companies</div></div>
-    <div class="stat-card"><div class="stat-val">$${(totalRev / 1000).toFixed(0)}B</div><div class="stat-lbl">Total revenue</div></div>
-    <div class="stat-card"><div class="stat-val">$${(totalAdj / 1000).toFixed(0)}B</div><div class="stat-lbl">Total adj. IT spend est.</div></div>
-    <div class="stat-card"><div class="stat-val">${(avgInt * 100).toFixed(2)}%</div><div class="stat-lbl">Avg IT intensity</div></div>
-  `;
+    <div class="stat-card"><div class="stat-val">$${(totalRev/1000).toFixed(0)}B</div><div class="stat-lbl">Total revenue</div></div>
+    <div class="stat-card"><div class="stat-val">$${(totalAdj/1000).toFixed(0)}B</div><div class="stat-lbl">Total adj. IT spend est.</div></div>
+    <div class="stat-card"><div class="stat-val">${(avgInt*100).toFixed(2)}%</div><div class="stat-lbl">Avg IT intensity</div></div>`;
 
-  const tbody = document.getElementById("tbl-body");
+  const tbody=document.getElementById("tbl-body");
+  if(!filtered.length){tbody.innerHTML="";document.getElementById("empty-msg").style.display="block";return;}
+  document.getElementById("empty-msg").style.display="none";
 
-  if (!filtered.length) {
-    tbody.innerHTML = "";
-    document.getElementById("empty-msg").style.display = "block";
-    return;
-  }
-  document.getElementById("empty-msg").style.display = "none";
+  tbody.innerHTML=filtered.map(r=>{
+    const isEdit=editingId===r.id;
+    const gPP=r.gDecimal*100, grpPP=r.grpAvg*100, diffPP=r.diff*100, adjPct=r.adjustment*100;
+    const diffCls=r.diff>0.001?"pos":r.diff<-0.001?"neg":"neu";
+    const adjCls=r.adjustment>0.00001?"pos":r.adjustment<-0.00001?"neg":"neu";
+    const adjBmCls=r.adjBm>r.base?"pos":r.adjBm<r.base?"neg":"neu";
+    const newBadge=r.isOriginal?"":"<span class='new-badge'>added</span>";
+    const rowCls=r.isOriginal?"":"new-co";
 
-  tbody.innerHTML = filtered.map(r => {
-    const isEdit  = editingId === r.id;
-    const gPP     = r.gDecimal * 100;
-    const grpPP   = r.grpAvg != null ? r.grpAvg * 100 : null;
-    const diffPP  = r.diff * 100;
-    const adjPct  = r.adjustment * 100;
-
-    const diffCls  = r.diff >  0.001  ? "pos" : r.diff  < -0.001  ? "neg" : "neu";
-    const adjCls   = r.adjustment >  0.00001 ? "pos" : r.adjustment < -0.00001 ? "neg" : "neu";
-    const adjBmCls = r.adjBm > r.base ? "pos" : r.adjBm < r.base   ? "neg" : "neu";
-
-    const grpDisp  = r.standalone ? "&mdash;" : fmtG(grpPP);
-    const diffDisp = r.standalone ? "&mdash;" : fmtG(diffPP);
-    const adjDisp  = r.standalone ? "&mdash;" : fmtAdj(adjPct);
-    const newBadge = r.isOriginal ? "" : "<span class='new-badge'>added</span>";
-    const rowCls   = r.isOriginal ? "" : "new-co";
-
-    if (isEdit) {
-      const baseEdit = (r.baseOverride != null ? r.baseOverride : r.bm.base) * 100;
-      return `
-        <tr class="${rowCls}" id="row-${r.id}">
-          <td><input class="inline-input" style="width:148px" id="ei-name" value="${r.name.replace(/"/g, '&quot;')}"></td>
-          <td><select class="inline-input" style="width:120px" id="ei-ind">
-            ${INDS.map(i => `<option${i === r.industry ? " selected" : ""}>${i}</option>`).join("")}
-          </select></td>
-          <td class="r"><input class="inline-input" style="width:72px" id="ei-rev" type="number" value="${r.revenue}"></td>
-          <td class="r muted">${fmt(r.estLow)}</td>
-          <td class="r muted">${fmt(r.estMid)}</td>
-          <td class="r muted">${fmt(r.estHigh)}</td>
-          <td class="r"><input class="inline-input" style="width:48px" id="ei-base" type="number" value="${baseEdit.toFixed(2)}" step="0.01" title="Base % (e.g. 11.40)"></td>
-          <td class="r"><input class="inline-input" style="width:48px" id="ei-g" type="number" value="${r.itFteGrowth}" step="0.1"></td>
-          <td class="r muted">${grpDisp}</td>
-          <td class="r"><span class="${diffCls}">${diffDisp}</span></td>
-          <td class="r"><span class="${adjCls}">${adjDisp}</span></td>
-          <td class="r"><span class="${adjBmCls} adj-final">${fmtP(r.adjBm)}</span></td>
-          <td class="r adj-final">${fmt(r.adjEst)}</td>
-          <td>
-            <button class="btn btn-blue btn-sm" onclick="saveEdit(${r.id})">Save</button>&nbsp;
-            <button class="btn btn-gray btn-sm" onclick="cancelEdit()">&#x2715;</button>
-          </td>
-        </tr>`;
-    }
-
-    return `
-      <tr class="${rowCls}" id="row-${r.id}">
-        <td style="font-weight:600">${r.name}${newBadge}</td>
-        <td style="font-size:10px;color:#666">${r.industry}</td>
-        <td class="r">${fmt(r.revenue)}</td>
+    if(isEdit){
+      const baseEdit=(r.baseOverride!=null?r.baseOverride:r.bm.base)*100;
+      return`<tr class="${rowCls}" id="row-${r.id}">
+        <td><input class="inline-input" style="width:148px" id="ei-name" value="${r.name.replace(/"/g,'&quot;')}"></td>
+        <td><select class="inline-input" style="width:122px" id="ei-ind">${INDS.map(i=>`<option${i===r.industry?" selected":""}>${i}</option>`).join("")}</select></td>
+        <td class="r"><input class="inline-input" style="width:72px" id="ei-rev" type="number" value="${r.revenue}"></td>
         <td class="r muted">${fmt(r.estLow)}</td>
         <td class="r muted">${fmt(r.estMid)}</td>
         <td class="r muted">${fmt(r.estHigh)}</td>
-        <td class="r base-col">${fmtP(r.base, 1)}</td>
-        <td class="r">${fmtG(gPP)}</td>
-        <td class="r muted">${grpDisp}</td>
-        <td class="r"><span class="${diffCls}">${diffDisp}</span></td>
-        <td class="r"><span class="${adjCls}">${adjDisp}</span></td>
+        <td class="r"><input class="inline-input" style="width:48px" id="ei-base" type="number" value="${baseEdit.toFixed(2)}" step="0.01"></td>
+        <td class="r"><input class="inline-input" style="width:48px" id="ei-g" type="number" value="${r.itFteGrowth}" step="0.1"></td>
+        <td class="r muted">${fmtG(grpPP)}</td>
+        <td class="r"><span class="${diffCls}">${fmtG(diffPP)}</span></td>
+        <td class="r"><span class="${adjCls}">${fmtAdj(adjPct)}</span></td>
         <td class="r"><span class="${adjBmCls} adj-final">${fmtP(r.adjBm)}</span></td>
-        <td class="r adj-final" style="font-size:12px">${fmt(r.adjEst)}</td>
-        <td>
-          <button class="edit-btn" onclick="startEdit(${r.id})" title="Edit">&#x270E;</button>
-          <button class="delete-btn" onclick="deleteCompany(${r.id})" title="Remove">&times;</button>
-        </td>
+        <td class="r adj-final">${fmt(r.adjEst)}</td>
+        <td><button class="btn btn-blue btn-sm" onclick="saveEdit(${r.id})">Save</button>&nbsp;<button class="btn btn-gray btn-sm" onclick="cancelEdit()">&#x2715;</button></td>
       </tr>`;
+    }
+    return`<tr class="${rowCls}" id="row-${r.id}">
+      <td style="font-weight:700">${r.name}${newBadge}</td>
+      <td style="font-size:10px;color:#666">${r.industry}</td>
+      <td class="r">${fmt(r.revenue)}</td>
+      <td class="r muted">${fmt(r.estLow)}</td>
+      <td class="r muted">${fmt(r.estMid)}</td>
+      <td class="r muted">${fmt(r.estHigh)}</td>
+      <td class="r base-col">${fmtP(r.base,1)}</td>
+      <td class="r">${fmtG(gPP)}</td>
+      <td class="r muted">${fmtG(grpPP)}</td>
+      <td class="r"><span class="${diffCls}">${fmtG(diffPP)}</span></td>
+      <td class="r"><span class="${adjCls}">${fmtAdj(adjPct)}</span></td>
+      <td class="r"><span class="${adjBmCls} adj-final">${fmtP(r.adjBm)}</span></td>
+      <td class="r adj-final" style="font-size:12px">${fmt(r.adjEst)}</td>
+      <td><button class="edit-btn" onclick="startEdit(${r.id})" title="Edit">&#x270E;</button><button class="delete-btn" onclick="deleteCompany(${r.id})" title="Remove">&times;</button></td>
+    </tr>`;
   }).join("");
 }
 
-// ─── Edit / delete ────────────────────────────────────────────────────────────
-function startEdit(id)  { editingId = id; render(); }
-function cancelEdit()   { editingId = null; render(); }
-
-function saveEdit(id) {
-  const idx = companies.findIndex(c => c.id === id);
-  if (idx < 0) return;
-  const ind      = document.getElementById("ei-ind").value;
-  const baseVal  = parseFloat(document.getElementById("ei-base").value) / 100;
-  const indBase  = BM[ind] ? BM[ind].base : 0;
-  companies[idx] = {
-    ...companies[idx],
-    name:         document.getElementById("ei-name").value,
-    industry:     ind,
-    revenue:      parseFloat(document.getElementById("ei-rev").value) || 0,
-    itFteGrowth:  parseFloat(document.getElementById("ei-g").value) || 0,
-    baseOverride: Math.abs(baseVal - indBase) > 0.00005 ? baseVal : null
-  };
-  editingId = null;
+function startEdit(id){editingId=id;render();}
+function cancelEdit(){editingId=null;render();}
+function saveEdit(id){
+  const idx=companies.findIndex(c=>c.id===id);
+  if(idx<0)return;
+  const ind=document.getElementById("ei-ind").value;
+  const baseVal=parseFloat(document.getElementById("ei-base").value)/100;
+  const indBase=BM[ind]?BM[ind].base:0;
+  companies[idx]={...companies[idx],name:document.getElementById("ei-name").value,industry:ind,revenue:parseFloat(document.getElementById("ei-rev").value)||0,itFteGrowth:parseFloat(document.getElementById("ei-g").value)||0,baseOverride:Math.abs(baseVal-indBase)>0.00005?baseVal:null};
+  editingId=null;render();
+}
+function deleteCompany(id){
+  if(!confirm("Remove this company?"))return;
+  companies=companies.filter(c=>c.id!==id);
+  if(editingId===id)editingId=null;
   render();
 }
-
-function deleteCompany(id) {
-  if (!confirm("Remove this company?")) return;
-  companies = companies.filter(c => c.id !== id);
-  if (editingId === id) editingId = null;
-  render();
+function toggleBm(){const p=document.getElementById("bm-panel");p.style.display=p.style.display==="none"?"block":"none";}
+function toggleForm(){const p=document.getElementById("form-panel");p.style.display=p.style.display==="none"?"block":"none";}
+function onNameInput(val){
+  const box=document.getElementById("suggestions");
+  if(val.length<2){box.style.display="none";return;}
+  const m=PRESETS.filter(p=>p.n.toLowerCase().includes(val.toLowerCase())).slice(0,7);
+  if(!m.length){box.style.display="none";return;}
+  box.innerHTML=m.map(p=>`<div class="suggest-item" onclick="selectPreset('${p.n.replace(/'/g,"&#39;")}')">${p.n} <span style="color:#aaa;font-size:10px">(${p.ind})</span></div>`).join("");
+  box.style.display="block";
 }
-
-// ─── Panels ───────────────────────────────────────────────────────────────────
-function toggleBm() {
-  const p = document.getElementById("bm-panel");
-  p.style.display = p.style.display === "none" ? "block" : "none";
+function selectPreset(name){
+  const p=PRESETS.find(x=>x.n===name);
+  if(!p)return;
+  document.getElementById("f-name").value=p.n;
+  document.getElementById("f-industry").value=p.ind;
+  document.getElementById("f-revenue").value=p.rev;
+  document.getElementById("f-growth").value=p.g;
+  document.getElementById("f-base").value="";
+  document.getElementById("suggestions").style.display="none";
 }
-function toggleForm() {
-  const p = document.getElementById("form-panel");
-  p.style.display = p.style.display === "none" ? "block" : "none";
+function addCompany(){
+  const name=document.getElementById("f-name").value.trim();
+  const rev=parseFloat(document.getElementById("f-revenue").value);
+  if(!name||!rev){alert("Company name and revenue are required.");return;}
+  const ind=document.getElementById("f-industry").value;
+  const baseInput=document.getElementById("f-base").value;
+  const baseOverride=baseInput!==""?parseFloat(baseInput)/100:null;
+  companies.push({id:++nextId,name,industry:ind,revenue:rev,itFteGrowth:parseFloat(document.getElementById("f-growth").value)||0,baseOverride,isOriginal:false});
+  ["f-name","f-revenue","f-growth","f-base"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("suggestions").style.display="none";
+  toggleForm();render();
 }
-
-// ─── Autocomplete ─────────────────────────────────────────────────────────────
-function onNameInput(val) {
-  if (val.length < 2) { document.getElementById("suggestions").style.display = "none"; return; }
-  const matches = PRESETS.filter(p => p.n.toLowerCase().includes(val.toLowerCase())).slice(0, 7);
-  const box = document.getElementById("suggestions");
-  if (!matches.length) { box.style.display = "none"; return; }
-  box.innerHTML = matches.map(p =>
-    `<div class="suggest-item" onclick="selectPreset('${p.n.replace(/'/g, "&#39;")}')">
-      ${p.n} <span style="color:#aaa;font-size:10px">(${p.ind})</span>
-    </div>`
-  ).join("");
-  box.style.display = "block";
-}
-
-function selectPreset(name) {
-  const p = PRESETS.find(x => x.n === name);
-  if (!p) return;
-  document.getElementById("f-name").value    = p.n;
-  document.getElementById("f-industry").value = p.ind;
-  document.getElementById("f-revenue").value  = p.rev;
-  document.getElementById("f-growth").value   = p.g;
-  document.getElementById("f-base").value     = "";
-  document.getElementById("suggestions").style.display = "none";
-}
-
-// ─── Add company ──────────────────────────────────────────────────────────────
-function addCompany() {
-  const name = document.getElementById("f-name").value.trim();
-  const rev  = parseFloat(document.getElementById("f-revenue").value);
-  if (!name || !rev) { alert("Company name and revenue are required."); return; }
-  const ind        = document.getElementById("f-industry").value;
-  const baseInput  = document.getElementById("f-base").value;
-  const baseOverride = baseInput !== "" ? parseFloat(baseInput) / 100 : null;
-  companies.push({
-    id: ++nextId, name, industry: ind, revenue: rev,
-    itFteGrowth: parseFloat(document.getElementById("f-growth").value) || 0,
-    baseOverride, isOriginal: false
-  });
-  ["f-name", "f-revenue", "f-growth", "f-base"].forEach(id => document.getElementById(id).value = "");
-  document.getElementById("suggestions").style.display = "none";
-  toggleForm();
-  render();
-}
-
-// ─── Export CSV ───────────────────────────────────────────────────────────────
-function exportCSV() {
-  const rows    = calcAll();
-  const filInd  = document.getElementById("fil-industry").value;
-  const filSet  = document.getElementById("fil-set").value;
-  const filtered = rows.filter(r => {
-    if (filInd !== "All" && r.industry !== filInd) return false;
-    if (filSet === "Original" && !r.isOriginal)    return false;
-    if (filSet === "New"      &&  r.isOriginal)    return false;
+function exportCSV(){
+  const rows=calcAll();
+  const filInd=document.getElementById("fil-industry").value;
+  const filSet=document.getElementById("fil-set").value;
+  const filtered=rows.filter(r=>{
+    if(filInd!=="All"&&r.industry!==filInd)return false;
+    if(filSet==="Original"&&!r.isOriginal)return false;
+    if(filSet==="New"&&r.isOriginal)return false;
     return true;
   });
-  const hdr = ["Company","Industry","Revenue ($M)","Est Low ($M)","Est Mid ($M)","Est High ($M)",
-               "Base %","IT FTE Growth (%)","Group Avg Growth (%)","Growth Differential (%)",
-               "Adjustment (%)","Adj Benchmark %","Adj IT Spend Est ($M)"];
-  const lines = [hdr.join(","), ...filtered.map(r => [
-    `"${r.name}"`, `"${r.industry}"`, Math.round(r.revenue),
-    Math.round(r.estLow), Math.round(r.estMid), Math.round(r.estHigh),
-    (r.base * 100).toFixed(2),
-    (r.gDecimal * 100).toFixed(2),
-    r.standalone ? "N/A" : (r.grpAvg * 100).toFixed(4),
-    r.standalone ? "N/A" : (r.diff   * 100).toFixed(4),
-    r.standalone ? "N/A" : (r.adjustment * 100).toFixed(4),
-    (r.adjBm * 100).toFixed(4),
-    Math.round(r.adjEst)
-  ].join(","))];
-  const blob = new Blob([lines.join("\n")], { type: "text/csv" });
-  const a    = document.createElement("a");
-  a.href     = URL.createObjectURL(blob);
-  a.download = "IT_Spend_Estimation.csv";
-  a.click();
+  const hdr=["Company","Industry","Revenue ($M)","Est Low ($M)","Est Mid ($M)","Est High ($M)","Base %","IT FTE Growth (%)","Group Avg Growth (%)","Growth Differential (%)","Adjustment (%)","Adj Benchmark %","Adj IT Spend Est ($M)"];
+  const lines=[hdr.join(","),...filtered.map(r=>[`"${r.name}"`,`"${r.industry}"`,Math.round(r.revenue),Math.round(r.estLow),Math.round(r.estMid),Math.round(r.estHigh),(r.base*100).toFixed(2),(r.gDecimal*100).toFixed(2),(r.grpAvg*100).toFixed(4),(r.diff*100).toFixed(4),(r.adjustment*100).toFixed(4),(r.adjBm*100).toFixed(4),Math.round(r.adjEst)].join(","))];
+  const blob=new Blob([lines.join("\n")],{type:"text/csv"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="IT_Spend_Estimation.csv";a.click();
 }
-
-// ─── Init ─────────────────────────────────────────────────────────────────────
-(function init() {
-  // Populate filter and form industry dropdowns
-  const indSel  = document.getElementById("fil-industry");
-  const formInd = document.getElementById("f-industry");
-  INDS.forEach(i => {
-    [indSel, formInd].forEach(sel => {
-      const o = document.createElement("option");
-      o.value = o.textContent = i;
-      sel.appendChild(o);
-    });
-  });
-
-  // Build benchmark cards
-  const bmGrid = document.getElementById("bm-grid");
-  INDS.forEach(ind => {
-    const b = BM[ind];
-    bmGrid.innerHTML += `
-      <div class="bm-card">
-        <div class="bm-ind">${ind}</div>
-        <div class="bm-base">Base: ${(b.base * 100).toFixed(1)}%</div>
-        <div class="bm-ranges">
-          <span class="bm-val bm-low">Low ${(b.low * 100).toFixed(1)}%</span>
-          <span class="bm-val bm-mid">Mid ${(b.mid * 100).toFixed(1)}%</span>
-          <span class="bm-val bm-high">High ${(b.high * 100).toFixed(1)}%</span>
-        </div>
-      </div>`;
-  });
-
-  // Close suggestions when clicking outside
-  document.addEventListener("click", e => {
-    if (!e.target.closest("#name-group")) {
-      document.getElementById("suggestions").style.display = "none";
-    }
-  });
-
+(function init(){
+  const indSel=document.getElementById("fil-industry"),formInd=document.getElementById("f-industry");
+  INDS.forEach(i=>{[indSel,formInd].forEach(sel=>{const o=document.createElement("option");o.value=o.textContent=i;sel.appendChild(o);});});
+  const bmGrid=document.getElementById("bm-grid");
+  INDS.forEach(ind=>{const b=BM[ind];bmGrid.innerHTML+=`<div class="bm-card"><div class="bm-ind">${ind}</div><div class="bm-base">Base: ${(b.base*100).toFixed(1)}%</div><div class="bm-ranges"><span class="bm-val bm-low">Low ${(b.low*100).toFixed(1)}%</span><span class="bm-val bm-mid">Mid ${(b.mid*100).toFixed(1)}%</span><span class="bm-val bm-high">High ${(b.high*100).toFixed(1)}%</span></div></div>`;});
+  document.addEventListener("click",e=>{if(!e.target.closest("#name-group"))document.getElementById("suggestions").style.display="none";});
   render();
 })();
 </script>
