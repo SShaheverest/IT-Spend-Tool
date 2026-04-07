@@ -39,6 +39,9 @@
   .form-input { padding: 7px 9px; border: 1px solid #ccc; border-radius: 6px; font-size: 12px; width: 100%; background: #fff; color: #222; }
   .form-input:focus { outline: none; border-color: #1A6FA8; box-shadow: 0 0 0 2px rgba(26,111,168,.15); }
   .form-hint { font-size: 10px; color: #999; font-style: italic; }
+  .checkbox-row { display: flex; align-items: center; gap: 7px; margin-top: 2px; }
+  .checkbox-row input[type=checkbox] { width: 14px; height: 14px; cursor: pointer; accent-color: #1A6FA8; }
+  .checkbox-row label { font-size: 11px; color: #444; cursor: pointer; line-height: 1.4; }
 
   .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #ccc; border-radius: 6px; z-index: 200; max-height: 180px; overflow-y: auto; box-shadow: 0 4px 14px rgba(0,0,0,.15); }
   .suggest-item { padding: 7px 10px; font-size: 12px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
@@ -68,11 +71,15 @@
   tbody td { padding: 7px 8px; border-bottom: 1px solid #eef0f3; vertical-align: middle; white-space: nowrap; border-right: 1px solid #f5f5f5; }
   tbody td:last-child { border-right: none; }
   tbody td.r { text-align: right; font-variant-numeric: tabular-nums; }
-  tbody tr:hover td   { background: #f4f8ff; }
-  tbody tr.new-co td  { background: #fffcf5; }
-  tbody tr.new-co:hover td { background: #fff5e6; }
+  tbody tr:hover td         { background: #f4f8ff; }
+  tbody tr.new-co td        { background: #fffcf5; }
+  tbody tr.new-co:hover td  { background: #fff5e6; }
+  tbody tr.exception-co td  { background: #f9f4ff; }
+  tbody tr.exception-co:hover td { background: #f2eaff; }
 
-  .new-badge { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; background: #fff3e0; color: #e65100; margin-left: 5px; vertical-align: middle; font-weight: 700; }
+  .new-badge       { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; background: #fff3e0; color: #e65100; margin-left: 5px; vertical-align: middle; font-weight: 700; }
+  .exception-badge { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; background: #ede7f6; color: #512da8; margin-left: 5px; vertical-align: middle; font-weight: 700; }
+  .isolated-badge  { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; background: #e8f5e9; color: #2e7d32; margin-left: 5px; vertical-align: middle; font-weight: 700; }
 
   .edit-btn, .delete-btn { background: none; border: none; cursor: pointer; padding: 3px 5px; border-radius: 4px; font-size: 14px; }
   .edit-btn   { color: #bbb; } .edit-btn:hover   { color: #1A6FA8; background: #e8f0fe; }
@@ -94,7 +101,7 @@
 <div class="hdr">
   <div>
     <div class="hdr-title">IT Spend Estimation Tool</div>
-    <div class="hdr-sub">Benchmark-driven &middot; Growth-rate adjusted &middot; Original group averages locked &middot; No cap or floor</div>
+    <div class="hdr-sub">Benchmark-driven &middot; Growth-rate adjusted</div>
   </div>
   <div class="hdr-btns">
     <button class="btn btn-gray"  onclick="toggleBm()">&#9776; Benchmarks</button>
@@ -109,7 +116,7 @@
 </div>
 
 <div id="form-panel" style="display:none" class="panel">
-  <div class="panel-title">Add company &mdash; new companies use all accounts in their industry for group average; original accounts are unaffected</div>
+  <div class="panel-title">Add company</div>
   <div class="form-grid">
     <div class="form-group" id="name-group">
       <label class="form-label">Company name</label>
@@ -134,6 +141,13 @@
       <input class="form-input" id="f-base" type="number" placeholder="Leave blank = industry default" step="0.01">
       <span class="form-hint">e.g. enter 2.5 for 2.5%</span>
     </div>
+    <div class="form-group" style="justify-content:flex-end;padding-bottom:4px">
+      <label class="form-label">Group avg calculation</label>
+      <div class="checkbox-row">
+        <input type="checkbox" id="f-isolated">
+        <label for="f-isolated">Use original accounts only<br><span style="color:#999;font-size:10px">(exclude other added companies)</span></label>
+      </div>
+    </div>
   </div>
   <div style="display:flex;gap:8px">
     <button class="btn btn-blue" onclick="addCompany()">Add Company</button>
@@ -156,12 +170,12 @@
 <div class="stats-bar" id="stats-bar"></div>
 
 <div class="formula-note">
-  <strong>Formula:</strong>&nbsp;
-  Group Avg (original accounts) = ROUND(AVERAGE(originals in industry), 4) &nbsp;|&nbsp;
-  Group Avg (added companies) = ROUND(AVERAGE(all accounts in industry), 4) &nbsp;|&nbsp;
-  Differential = IT FTE Growth &minus; Group Avg &nbsp;|&nbsp;
-  Adjustment = Differential &times; 0.25 &nbsp;|&nbsp;
-  Adj. Benchmark % = Base % + Adjustment &nbsp;|&nbsp;
+  <strong>Group avg rules:</strong>&nbsp;
+  Standard originals = ROUND(AVERAGE(originals excl. exceptions), 4) &nbsp;|&nbsp;
+  Exception accounts (Tesla, McDonald&#39;s) = ROUND(AVERAGE(all originals in industry), 4) &nbsp;|&nbsp;
+  Added (standard) = ROUND(AVERAGE(all accounts in industry), 4) &nbsp;|&nbsp;
+  Added (isolated) = ROUND(AVERAGE(originals + itself), 4) &nbsp;|&nbsp;
+  <strong>Formula:</strong> Adj. Benchmark % = Base % + (IT FTE Growth &minus; Group Avg) &times; 0.25 &nbsp;|&nbsp;
   Adj. IT Spend Est. = Revenue &times; Adj. Benchmark %
 </div>
 
@@ -169,7 +183,7 @@
   <table>
     <thead>
       <tr>
-        <th style="min-width:175px">Company</th>
+        <th style="min-width:185px">Company</th>
         <th style="min-width:115px">Industry</th>
         <th class="r">Revenue<br>($M)</th>
         <th class="r">Est. Low<br>($M)</th>
@@ -191,19 +205,25 @@
 </div>
 
 <script>
+// ── Benchmarks ────────────────────────────────────────────────────────────────
 const BM = {
-  "Financial Services":              {low:.044,mid:.079,high:.114,base:.114},
-  "Life Sciences & Health Care":     {low:.045,mid:.055,high:.075,base:.055},
-  "Retail":                          {low:.020,mid:.025,high:.035,base:.020},
-  "Automotive":                      {low:.020,mid:.030,high:.045,base:.030},
-  "FMCG":                            {low:.015,mid:.020,high:.030,base:.030},
-  "Energy, Resources & Industrials": {low:.014,mid:.027,high:.040,base:.027},
-  "Telecom":                         {low:.050,mid:.085,high:.110,base:.085},
-  "SaaS":                            {low:.150,mid:.200,high:.250,base:.200},
-  "IDM (Integrated Device Mfg)":     {low:.025,mid:.035,high:.050,base:.025}
+  "Financial Services":              {low:.044, mid:.079, high:.114, base:.114},
+  "Life Sciences & Health Care":     {low:.045, mid:.055, high:.075, base:.055},
+  "Retail":                          {low:.020, mid:.025, high:.035, base:.020},
+  "Automotive":                      {low:.020, mid:.030, high:.045, base:.030},
+  "FMCG":                            {low:.015, mid:.020, high:.030, base:.030},
+  "Energy, Resources & Industrials": {low:.014, mid:.027, high:.040, base:.027},
+  "Telecom":                         {low:.050, mid:.085, high:.110, base:.085},
+  "SaaS":                            {low:.150, mid:.200, high:.250, base:.200},
+  "IDM (Integrated Device Mfg)":     {low:.025, mid:.035, high:.050, base:.025}
 };
 const INDS = Object.keys(BM);
 
+// Exceptions: these accounts are excluded from the standard-originals group avg
+// but their OWN group avg is calculated using all originals in their industry.
+const EXCEPTIONS = ["Tesla, Inc.", "McDonald's Corporation"];
+
+// ── Presets ───────────────────────────────────────────────────────────────────
 const PRESETS = [
   {n:"Bank of America Corporation",ind:"Financial Services",rev:113100,g:5},
   {n:"HSBC",ind:"Financial Services",rev:68274,g:2},
@@ -241,89 +261,135 @@ const PRESETS = [
   {n:"Intel",ind:"IDM (Integrated Device Mfg)",rev:52900,g:-2}
 ];
 
-let companies = PRESETS.map((p,i) => ({id:i+1,name:p.n,industry:p.ind,revenue:p.rev,itFteGrowth:p.g,baseOverride:p.base!=null?p.base:null,isOriginal:true}));
-let editingId=null, nextId=200;
+// ── State ─────────────────────────────────────────────────────────────────────
+let companies = PRESETS.map((p, i) => ({
+  id: i + 1,
+  name: p.n,
+  industry: p.ind,
+  revenue: p.rev,
+  itFteGrowth: p.g,
+  baseOverride: p.base != null ? p.base : null,
+  isOriginal: true,
+  isException: EXCEPTIONS.includes(p.n),
+  isolated: false   // only relevant for added companies
+}));
+let editingId = null, nextId = 200;
 
-function roundTo4(x){return Math.round(x*10000)/10000;}
-function fmt(n){return Math.round(n).toLocaleString();}
-function fmtP(n,d){return(n*100).toFixed(d!=null?d:2)+"%";}
-function fmtG(n){return(n>=0?"+":"")+n.toFixed(2)+"%";}
-function fmtAdj(n){return(n>=0?"+":"")+n.toFixed(4)+"%";}
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function roundTo4(x) { return Math.round(x * 10000) / 10000; }
+function fmt(n)       { return Math.round(n).toLocaleString(); }
+function fmtP(n, d)   { return (n * 100).toFixed(d != null ? d : 2) + "%"; }
+function fmtG(n)      { return (n >= 0 ? "+" : "") + n.toFixed(2) + "%"; }
+function fmtAdj(n)    { return (n >= 0 ? "+" : "") + n.toFixed(4) + "%"; }
 
-function buildAvgMap(subset){
-  const map={};
-  INDS.forEach(ind=>{
-    const grp=subset.filter(c=>c.industry===ind);
-    if(grp.length){
-      const avg=grp.reduce((s,c)=>s+(Number(c.itFteGrowth)||0),0)/grp.length;
-      map[ind]=roundTo4(avg/100);
+function avgOf(subset) {
+  if (!subset.length) return 0;
+  return roundTo4(subset.reduce((s, c) => s + (Number(c.itFteGrowth) || 0), 0) / subset.length / 100);
+}
+
+// ── Core calculation ──────────────────────────────────────────────────────────
+//
+// Group average rules:
+//
+//  A) Standard original accounts (not exceptions):
+//     avg of originals in their industry, EXCLUDING exception accounts
+//
+//  B) Exception original accounts (Tesla, McDonald's):
+//     avg of ALL originals in their industry (including themselves and other exceptions)
+//
+//  C) Added accounts (isolated = true):
+//     avg of all originals in industry + themselves only (no other added accounts)
+//
+//  D) Added accounts (isolated = false):
+//     avg of ALL accounts in industry (originals + all added)
+//
+function calcAll() {
+  return companies.map(c => {
+    const bm  = BM[c.industry] || BM["Financial Services"];
+    const rev = Number(c.revenue) || 0;
+    const gD  = (Number(c.itFteGrowth) || 0) / 100;
+    const base = c.baseOverride != null ? c.baseOverride : bm.base;
+
+    const originalsInInd    = companies.filter(x => x.isOriginal   && x.industry === c.industry);
+    const nonExcOriginalsInInd = companies.filter(x => x.isOriginal && !x.isException && x.industry === c.industry);
+    const allInInd          = companies.filter(x => x.industry === c.industry);
+
+    let grpAvg;
+    if (c.isOriginal && c.isException) {
+      // Rule B: all originals in industry
+      grpAvg = avgOf(originalsInInd);
+    } else if (c.isOriginal && !c.isException) {
+      // Rule A: originals in industry excluding exceptions
+      grpAvg = avgOf(nonExcOriginalsInInd);
+    } else if (!c.isOriginal && c.isolated) {
+      // Rule C: originals + self
+      grpAvg = avgOf([...originalsInInd, c]);
     } else {
-      map[ind]=0;
+      // Rule D: everyone in industry
+      grpAvg = avgOf(allInInd);
     }
-  });
-  return map;
+
+    const estLow  = rev * bm.low;
+    const estMid  = rev * bm.mid;
+    const estHigh = rev * bm.high;
+    const diff       = gD - grpAvg;
+    const adjustment = diff * 0.25;
+    const adjBm      = base + adjustment;
+    const adjEst     = rev * adjBm;
+
+    return { ...c, bm, estLow, estMid, estHigh, base, grpAvg, gD, diff, adjustment, adjBm, adjEst };
+  }).sort((a, b) => b.revenue - a.revenue);
 }
 
-function calcAll(){
-  const origAvgs = buildAvgMap(companies.filter(c=>c.isOriginal));
-  const allAvgs  = buildAvgMap(companies);
-
-  return companies.map(c=>{
-    const bm=BM[c.industry]||BM["Financial Services"];
-    const rev=Number(c.revenue)||0;
-    const gDecimal=(Number(c.itFteGrowth)||0)/100;
-    const base=c.baseOverride!=null?c.baseOverride:bm.base;
-    const grpAvg=c.isOriginal?(origAvgs[c.industry]||0):(allAvgs[c.industry]||0);
-
-    const estLow=rev*bm.low, estMid=rev*bm.mid, estHigh=rev*bm.high;
-    const diff=gDecimal-grpAvg;
-    const adjustment=diff*0.25;
-    const adjBm=base+adjustment;
-    const adjEst=rev*adjBm;
-
-    return{...c,bm,estLow,estMid,estHigh,base,grpAvg,gDecimal,diff,adjustment,adjBm,adjEst};
-  }).sort((a,b)=>b.revenue-a.revenue);
-}
-
-function render(){
-  const rows=calcAll();
-  const filInd=document.getElementById("fil-industry").value;
-  const filSet=document.getElementById("fil-set").value;
-  const filtered=rows.filter(r=>{
-    if(filInd!=="All"&&r.industry!==filInd)return false;
-    if(filSet==="Original"&&!r.isOriginal)return false;
-    if(filSet==="New"&&r.isOriginal)return false;
+// ── Render ────────────────────────────────────────────────────────────────────
+function render() {
+  const rows     = calcAll();
+  const filInd   = document.getElementById("fil-industry").value;
+  const filSet   = document.getElementById("fil-set").value;
+  const filtered = rows.filter(r => {
+    if (filInd !== "All" && r.industry !== filInd) return false;
+    if (filSet === "Original" && !r.isOriginal)    return false;
+    if (filSet === "New"      &&  r.isOriginal)    return false;
     return true;
   });
 
-  document.getElementById("count-label").textContent=filtered.length+" companies";
+  document.getElementById("count-label").textContent = filtered.length + " companies";
 
-  const totalRev=filtered.reduce((s,r)=>s+r.revenue,0);
-  const totalAdj=filtered.reduce((s,r)=>s+r.adjEst,0);
-  const avgInt=totalRev>0?totalAdj/totalRev:0;
+  const totalRev = filtered.reduce((s, r) => s + r.revenue, 0);
+  const totalAdj = filtered.reduce((s, r) => s + r.adjEst,  0);
+  const avgInt   = totalRev > 0 ? totalAdj / totalRev : 0;
 
-  document.getElementById("stats-bar").innerHTML=`
+  document.getElementById("stats-bar").innerHTML = `
     <div class="stat-card"><div class="stat-val">${filtered.length}</div><div class="stat-lbl">Companies</div></div>
     <div class="stat-card"><div class="stat-val">$${(totalRev/1000).toFixed(0)}B</div><div class="stat-lbl">Total revenue</div></div>
     <div class="stat-card"><div class="stat-val">$${(totalAdj/1000).toFixed(0)}B</div><div class="stat-lbl">Total adj. IT spend est.</div></div>
     <div class="stat-card"><div class="stat-val">${(avgInt*100).toFixed(2)}%</div><div class="stat-lbl">Avg IT intensity</div></div>`;
 
-  const tbody=document.getElementById("tbl-body");
-  if(!filtered.length){tbody.innerHTML="";document.getElementById("empty-msg").style.display="block";return;}
-  document.getElementById("empty-msg").style.display="none";
+  const tbody = document.getElementById("tbl-body");
+  if (!filtered.length) { tbody.innerHTML = ""; document.getElementById("empty-msg").style.display = "block"; return; }
+  document.getElementById("empty-msg").style.display = "none";
 
-  tbody.innerHTML=filtered.map(r=>{
-    const isEdit=editingId===r.id;
-    const gPP=r.gDecimal*100, grpPP=r.grpAvg*100, diffPP=r.diff*100, adjPct=r.adjustment*100;
-    const diffCls=r.diff>0.001?"pos":r.diff<-0.001?"neg":"neu";
-    const adjCls=r.adjustment>0.00001?"pos":r.adjustment<-0.00001?"neg":"neu";
-    const adjBmCls=r.adjBm>r.base?"pos":r.adjBm<r.base?"neg":"neu";
-    const newBadge=r.isOriginal?"":"<span class='new-badge'>added</span>";
-    const rowCls=r.isOriginal?"":"new-co";
+  tbody.innerHTML = filtered.map(r => {
+    const isEdit   = editingId === r.id;
+    const gPP      = r.gD * 100;
+    const grpPP    = r.grpAvg * 100;
+    const diffPP   = r.diff * 100;
+    const adjPct   = r.adjustment * 100;
+    const diffCls  = r.diff > 0.001 ? "pos" : r.diff < -0.001 ? "neg" : "neu";
+    const adjCls   = r.adjustment > 0.00001 ? "pos" : r.adjustment < -0.00001 ? "neg" : "neu";
+    const adjBmCls = r.adjBm > r.base ? "pos" : r.adjBm < r.base ? "neg" : "neu";
 
-    if(isEdit){
-      const baseEdit=(r.baseOverride!=null?r.baseOverride:r.bm.base)*100;
-      return`<tr class="${rowCls}" id="row-${r.id}">
+    // Badges
+    let badge = "";
+    if (!r.isOriginal && r.isolated) badge = "<span class='isolated-badge'>isolated avg</span>";
+    else if (!r.isOriginal)          badge = "<span class='new-badge'>added</span>";
+    else if (r.isException)          badge = "<span class='exception-badge'>exception</span>";
+
+    const rowCls = r.isOriginal ? (r.isException ? "exception-co" : "") : "new-co";
+
+    if (isEdit) {
+      const baseEdit = (r.baseOverride != null ? r.baseOverride : r.bm.base) * 100;
+      return `<tr class="${rowCls}" id="row-${r.id}">
         <td><input class="inline-input" style="width:148px" id="ei-name" value="${r.name.replace(/"/g,'&quot;')}"></td>
         <td><select class="inline-input" style="width:122px" id="ei-ind">${INDS.map(i=>`<option${i===r.industry?" selected":""}>${i}</option>`).join("")}</select></td>
         <td class="r"><input class="inline-input" style="width:72px" id="ei-rev" type="number" value="${r.revenue}"></td>
@@ -340,8 +406,9 @@ function render(){
         <td><button class="btn btn-blue btn-sm" onclick="saveEdit(${r.id})">Save</button>&nbsp;<button class="btn btn-gray btn-sm" onclick="cancelEdit()">&#x2715;</button></td>
       </tr>`;
     }
-    return`<tr class="${rowCls}" id="row-${r.id}">
-      <td style="font-weight:700">${r.name}${newBadge}</td>
+
+    return `<tr class="${rowCls}" id="row-${r.id}">
+      <td style="font-weight:700">${r.name}${badge}</td>
       <td style="font-size:10px;color:#666">${r.industry}</td>
       <td class="r">${fmt(r.revenue)}</td>
       <td class="r muted">${fmt(r.estLow)}</td>
@@ -359,76 +426,115 @@ function render(){
   }).join("");
 }
 
-function startEdit(id){editingId=id;render();}
-function cancelEdit(){editingId=null;render();}
-function saveEdit(id){
-  const idx=companies.findIndex(c=>c.id===id);
-  if(idx<0)return;
-  const ind=document.getElementById("ei-ind").value;
-  const baseVal=parseFloat(document.getElementById("ei-base").value)/100;
-  const indBase=BM[ind]?BM[ind].base:0;
-  companies[idx]={...companies[idx],name:document.getElementById("ei-name").value,industry:ind,revenue:parseFloat(document.getElementById("ei-rev").value)||0,itFteGrowth:parseFloat(document.getElementById("ei-g").value)||0,baseOverride:Math.abs(baseVal-indBase)>0.00005?baseVal:null};
-  editingId=null;render();
+// ── Edit / delete ─────────────────────────────────────────────────────────────
+function startEdit(id) { editingId = id;   render(); }
+function cancelEdit()  { editingId = null; render(); }
+
+function saveEdit(id) {
+  const idx = companies.findIndex(c => c.id === id);
+  if (idx < 0) return;
+  const ind     = document.getElementById("ei-ind").value;
+  const baseVal = parseFloat(document.getElementById("ei-base").value) / 100;
+  const indBase = BM[ind] ? BM[ind].base : 0;
+  companies[idx] = {
+    ...companies[idx],
+    name:         document.getElementById("ei-name").value,
+    industry:     ind,
+    isException:  EXCEPTIONS.includes(document.getElementById("ei-name").value),
+    revenue:      parseFloat(document.getElementById("ei-rev").value) || 0,
+    itFteGrowth:  parseFloat(document.getElementById("ei-g").value) || 0,
+    baseOverride: Math.abs(baseVal - indBase) > 0.00005 ? baseVal : null
+  };
+  editingId = null; render();
 }
-function deleteCompany(id){
-  if(!confirm("Remove this company?"))return;
-  companies=companies.filter(c=>c.id!==id);
-  if(editingId===id)editingId=null;
+
+function deleteCompany(id) {
+  if (!confirm("Remove this company?")) return;
+  companies = companies.filter(c => c.id !== id);
+  if (editingId === id) editingId = null;
   render();
 }
-function toggleBm(){const p=document.getElementById("bm-panel");p.style.display=p.style.display==="none"?"block":"none";}
-function toggleForm(){const p=document.getElementById("form-panel");p.style.display=p.style.display==="none"?"block":"none";}
-function onNameInput(val){
-  const box=document.getElementById("suggestions");
-  if(val.length<2){box.style.display="none";return;}
-  const m=PRESETS.filter(p=>p.n.toLowerCase().includes(val.toLowerCase())).slice(0,7);
-  if(!m.length){box.style.display="none";return;}
-  box.innerHTML=m.map(p=>`<div class="suggest-item" onclick="selectPreset('${p.n.replace(/'/g,"&#39;")}')">${p.n} <span style="color:#aaa;font-size:10px">(${p.ind})</span></div>`).join("");
-  box.style.display="block";
+
+// ── Panels ────────────────────────────────────────────────────────────────────
+function toggleBm()   { const p = document.getElementById("bm-panel");   p.style.display = p.style.display === "none" ? "block" : "none"; }
+function toggleForm() { const p = document.getElementById("form-panel"); p.style.display = p.style.display === "none" ? "block" : "none"; }
+
+// ── Autocomplete ──────────────────────────────────────────────────────────────
+function onNameInput(val) {
+  const box = document.getElementById("suggestions");
+  if (val.length < 2) { box.style.display = "none"; return; }
+  const m = PRESETS.filter(p => p.n.toLowerCase().includes(val.toLowerCase())).slice(0, 7);
+  if (!m.length) { box.style.display = "none"; return; }
+  box.innerHTML = m.map(p => `<div class="suggest-item" onclick="selectPreset('${p.n.replace(/'/g,"&#39;")}')">${p.n} <span style="color:#aaa;font-size:10px">(${p.ind})</span></div>`).join("");
+  box.style.display = "block";
 }
-function selectPreset(name){
-  const p=PRESETS.find(x=>x.n===name);
-  if(!p)return;
-  document.getElementById("f-name").value=p.n;
-  document.getElementById("f-industry").value=p.ind;
-  document.getElementById("f-revenue").value=p.rev;
-  document.getElementById("f-growth").value=p.g;
-  document.getElementById("f-base").value="";
-  document.getElementById("suggestions").style.display="none";
+function selectPreset(name) {
+  const p = PRESETS.find(x => x.n === name);
+  if (!p) return;
+  document.getElementById("f-name").value     = p.n;
+  document.getElementById("f-industry").value = p.ind;
+  document.getElementById("f-revenue").value  = p.rev;
+  document.getElementById("f-growth").value   = p.g;
+  document.getElementById("f-base").value     = "";
+  document.getElementById("suggestions").style.display = "none";
 }
-function addCompany(){
-  const name=document.getElementById("f-name").value.trim();
-  const rev=parseFloat(document.getElementById("f-revenue").value);
-  if(!name||!rev){alert("Company name and revenue are required.");return;}
-  const ind=document.getElementById("f-industry").value;
-  const baseInput=document.getElementById("f-base").value;
-  const baseOverride=baseInput!==""?parseFloat(baseInput)/100:null;
-  companies.push({id:++nextId,name,industry:ind,revenue:rev,itFteGrowth:parseFloat(document.getElementById("f-growth").value)||0,baseOverride,isOriginal:false});
-  ["f-name","f-revenue","f-growth","f-base"].forEach(id=>document.getElementById(id).value="");
-  document.getElementById("suggestions").style.display="none";
-  toggleForm();render();
+
+// ── Add company ───────────────────────────────────────────────────────────────
+function addCompany() {
+  const name = document.getElementById("f-name").value.trim();
+  const rev  = parseFloat(document.getElementById("f-revenue").value);
+  if (!name || !rev) { alert("Company name and revenue are required."); return; }
+  const ind          = document.getElementById("f-industry").value;
+  const baseInput    = document.getElementById("f-base").value;
+  const baseOverride = baseInput !== "" ? parseFloat(baseInput) / 100 : null;
+  const isolated     = document.getElementById("f-isolated").checked;
+  companies.push({
+    id: ++nextId, name, industry: ind, revenue: rev,
+    itFteGrowth:  parseFloat(document.getElementById("f-growth").value) || 0,
+    baseOverride, isOriginal: false, isException: false, isolated
+  });
+  ["f-name","f-revenue","f-growth","f-base"].forEach(id => document.getElementById(id).value = "");
+  document.getElementById("f-isolated").checked = false;
+  document.getElementById("suggestions").style.display = "none";
+  toggleForm(); render();
 }
-function exportCSV(){
-  const rows=calcAll();
-  const filInd=document.getElementById("fil-industry").value;
-  const filSet=document.getElementById("fil-set").value;
-  const filtered=rows.filter(r=>{
-    if(filInd!=="All"&&r.industry!==filInd)return false;
-    if(filSet==="Original"&&!r.isOriginal)return false;
-    if(filSet==="New"&&r.isOriginal)return false;
+
+// ── Export CSV ────────────────────────────────────────────────────────────────
+function exportCSV() {
+  const rows     = calcAll();
+  const filInd   = document.getElementById("fil-industry").value;
+  const filSet   = document.getElementById("fil-set").value;
+  const filtered = rows.filter(r => {
+    if (filInd !== "All" && r.industry !== filInd) return false;
+    if (filSet === "Original" && !r.isOriginal)    return false;
+    if (filSet === "New"      &&  r.isOriginal)    return false;
     return true;
   });
-  const hdr=["Company","Industry","Revenue ($M)","Est Low ($M)","Est Mid ($M)","Est High ($M)","Base %","IT FTE Growth (%)","Group Avg Growth (%)","Growth Differential (%)","Adjustment (%)","Adj Benchmark %","Adj IT Spend Est ($M)"];
-  const lines=[hdr.join(","),...filtered.map(r=>[`"${r.name}"`,`"${r.industry}"`,Math.round(r.revenue),Math.round(r.estLow),Math.round(r.estMid),Math.round(r.estHigh),(r.base*100).toFixed(2),(r.gDecimal*100).toFixed(2),(r.grpAvg*100).toFixed(4),(r.diff*100).toFixed(4),(r.adjustment*100).toFixed(4),(r.adjBm*100).toFixed(4),Math.round(r.adjEst)].join(","))];
-  const blob=new Blob([lines.join("\n")],{type:"text/csv"});
-  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="IT_Spend_Estimation.csv";a.click();
+  const hdr = ["Company","Industry","Revenue ($M)","Est Low ($M)","Est Mid ($M)","Est High ($M)","Base %","IT FTE Growth (%)","Group Avg Growth (%)","Growth Differential (%)","Adjustment (%)","Adj Benchmark %","Adj IT Spend Est ($M)","Account Type"];
+  const lines = [hdr.join(","), ...filtered.map(r => {
+    const type = !r.isOriginal ? (r.isolated ? "Added (isolated)" : "Added") : (r.isException ? "Original (exception)" : "Original");
+    return [`"${r.name}"`,`"${r.industry}"`,Math.round(r.revenue),Math.round(r.estLow),Math.round(r.estMid),Math.round(r.estHigh),(r.base*100).toFixed(2),(r.gD*100).toFixed(2),(r.grpAvg*100).toFixed(4),(r.diff*100).toFixed(4),(r.adjustment*100).toFixed(4),(r.adjBm*100).toFixed(4),Math.round(r.adjEst),`"${type}"`].join(",");
+  })];
+  const blob = new Blob([lines.join("\n")], {type:"text/csv"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "IT_Spend_Estimation.csv";
+  a.click();
 }
-(function init(){
-  const indSel=document.getElementById("fil-industry"),formInd=document.getElementById("f-industry");
-  INDS.forEach(i=>{[indSel,formInd].forEach(sel=>{const o=document.createElement("option");o.value=o.textContent=i;sel.appendChild(o);});});
-  const bmGrid=document.getElementById("bm-grid");
-  INDS.forEach(ind=>{const b=BM[ind];bmGrid.innerHTML+=`<div class="bm-card"><div class="bm-ind">${ind}</div><div class="bm-base">Base: ${(b.base*100).toFixed(1)}%</div><div class="bm-ranges"><span class="bm-val bm-low">Low ${(b.low*100).toFixed(1)}%</span><span class="bm-val bm-mid">Mid ${(b.mid*100).toFixed(1)}%</span><span class="bm-val bm-high">High ${(b.high*100).toFixed(1)}%</span></div></div>`;});
-  document.addEventListener("click",e=>{if(!e.target.closest("#name-group"))document.getElementById("suggestions").style.display="none";});
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+(function init() {
+  const indSel = document.getElementById("fil-industry");
+  const formInd = document.getElementById("f-industry");
+  INDS.forEach(i => {
+    [indSel, formInd].forEach(sel => { const o = document.createElement("option"); o.value = o.textContent = i; sel.appendChild(o); });
+  });
+  const bmGrid = document.getElementById("bm-grid");
+  INDS.forEach(ind => {
+    const b = BM[ind];
+    bmGrid.innerHTML += `<div class="bm-card"><div class="bm-ind">${ind}</div><div class="bm-base">Base: ${(b.base*100).toFixed(1)}%</div><div class="bm-ranges"><span class="bm-val bm-low">Low ${(b.low*100).toFixed(1)}%</span><span class="bm-val bm-mid">Mid ${(b.mid*100).toFixed(1)}%</span><span class="bm-val bm-high">High ${(b.high*100).toFixed(1)}%</span></div></div>`;
+  });
+  document.addEventListener("click", e => { if (!e.target.closest("#name-group")) document.getElementById("suggestions").style.display = "none"; });
   render();
 })();
 </script>
