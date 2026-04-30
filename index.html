@@ -100,9 +100,49 @@
   .adj-final { color: #1A5276; font-weight: 700; }
   .sw-final  { color: #1E6B4A; font-weight: 700; }
   .empty { text-align: center; padding: 50px; color: #bbb; font-size: 13px; }
+
+  #pw-gate {
+    position: fixed; inset: 0; background: #1F2D40;
+    display: flex; align-items: center; justify-content: center; z-index: 9999;
+  }
+  .pw-box {
+    background: #fff; border-radius: 12px; padding: 40px 44px;
+    width: 100%; max-width: 380px; text-align: center;
+    box-shadow: 0 8px 40px rgba(0,0,0,.35);
+  }
+  .pw-logo { font-size: 28px; font-weight: 700; color: #1F2D40; letter-spacing: -.5px; }
+  .pw-tagline { font-size: 11px; color: #888; margin: 6px 0 26px; }
+  .pw-label { font-size: 12px; font-weight: 700; color: #555; text-align: left; display: block; margin-bottom: 6px; }
+  .pw-input {
+    width: 100%; padding: 10px 12px; border: 1.5px solid #dde1e7; border-radius: 7px;
+    font-size: 14px; font-family: Arial, sans-serif; color: #222;
+    outline: none; transition: border-color .2s;
+  }
+  .pw-input:focus { border-color: #1A6FA8; box-shadow: 0 0 0 3px rgba(26,111,168,.12); }
+  .pw-btn {
+    width: 100%; margin-top: 14px; padding: 11px; background: #1A6FA8; color: #fff;
+    border: none; border-radius: 7px; font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: filter .15s; font-family: Arial, sans-serif;
+  }
+  .pw-btn:hover { filter: brightness(1.1); }
+  .pw-error { margin-top: 10px; font-size: 12px; color: #c0392b; font-weight: 600; display: none; }
 </style>
 </head>
 <body>
+
+<div id="pw-gate">
+  <div class="pw-box">
+    <div class="pw-logo">SpendIQ</div>
+    <div class="pw-tagline">Technology Investment Intelligence</div>
+    <label class="pw-label" for="pw-input">Enter password to continue</label>
+    <input class="pw-input" type="password" id="pw-input" placeholder="Password"
+           onkeydown="if(event.key==='Enter')checkPw()">
+    <button class="pw-btn" onclick="checkPw()">Continue</button>
+    <div class="pw-error" id="pw-error">Incorrect password. Please try again.</div>
+  </div>
+</div>
+
+<div id="app-content" style="display:none">
 
 <div class="hdr">
   <div>
@@ -548,6 +588,25 @@ function exportCSV() {
   });
   render();
 })();
+</script>
+</div><!-- /app-content -->
+
+<script>
+// ── Password gate ────────────────────────────────────────────────────────────
+const CORRECT_PW = "SpendIQ2025";
+function checkPw() {
+  const val = document.getElementById("pw-input").value;
+  const err = document.getElementById("pw-error");
+  if (val === CORRECT_PW) {
+    document.getElementById("pw-gate").style.display = "none";
+    document.getElementById("app-content").style.display = "block";
+    err.style.display = "none";
+  } else {
+    err.style.display = "block";
+    document.getElementById("pw-input").value = "";
+    document.getElementById("pw-input").focus();
+  }
+}
 </script>
 </body>
 </html>
