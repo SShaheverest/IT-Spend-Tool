@@ -78,6 +78,8 @@
   tbody td.r { text-align: right; font-variant-numeric: tabular-nums; }
   tbody tr:hover td              { background: #f4f8ff; }
   tbody tr.new-co td             { background: #fffcf5; }
+  tbody tr.indicative-co td       { background: #f6fdf6; }
+  tbody tr.indicative-co:hover td { background: #ecf9ec; }
   tbody tr.new-co:hover td       { background: #fff5e6; }
   tbody tr.exception-co td       { background: #f5f0ff; }
   tbody tr.exception-co:hover td { background: #ede5ff; }
@@ -85,6 +87,7 @@
   .new-badge       { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; background: #fff3e0; color: #e65100; margin-left: 4px; vertical-align: middle; font-weight: 700; }
   .exception-badge { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; background: #ede7f6; color: #512da8; margin-left: 4px; vertical-align: middle; font-weight: 700; }
   .isolated-badge  { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; background: #e8f5e9; color: #2e7d32; margin-left: 4px; vertical-align: middle; font-weight: 700; }
+  .indicative-badge { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; background: #f0fdf4; color: #276749; margin-left: 4px; vertical-align: middle; font-weight: 700; border: 1px dashed #276749; }
 
   .edit-btn, .delete-btn { background: none; border: none; cursor: pointer; padding: 3px 5px; border-radius: 4px; font-size: 14px; }
   .edit-btn   { color: #bbb; } .edit-btn:hover   { color: #1A6FA8; background: #e8f0fe; }
@@ -278,40 +281,91 @@ const EXCEPTIONS = ["Tesla, Inc.", "McDonald's Corporation", "Walmart Inc."];
 
 // ── Preset companies ───────────────────────────────────────────────────────
 const PRESETS = [
-  {n:"Bank of America Corporation",       ind:"Banking & Financial Services",    rev:113100, g:5},
-  {n:"HSBC",                              ind:"Banking & Financial Services",    rev:68274,  g:2},
-  {n:"Visa Inc.",                         ind:"Banking & Financial Services",    rev:40000,  g:2},
-  {n:"Mastercard Incorporated",           ind:"Banking & Financial Services",    rev:32800,  g:6},
-  {n:"Exxon Mobil Corporation",           ind:"Energy & Utilities",              rev:332238, g:1},
-  {n:"Siemens Corporation",              ind:"Energy & Utilities",              rev:89263,  g:6},
-  {n:"Shell USA Inc.",                    ind:"Energy & Utilities",              rev:273700, g:9},
-  {n:"Pfizer Inc.",                       ind:"HLS (Healthcare & Life Sciences)",rev:62579,  g:1},
-  {n:"AstraZeneca LP",                    ind:"HLS (Healthcare & Life Sciences)",rev:58739,  g:4},
-  {n:"Novartis AG",                       ind:"HLS (Healthcare & Life Sciences)",rev:54532,  g:5},
-  {n:"Kroger Co., The",                   ind:"Retail",                          rev:147642, g:5},
-  {n:"Walmart Inc.",                      ind:"Retail",                          rev:680985, g:0, base:.025},
-  {n:"Target",                            ind:"Retail",                          rev:106566, g:2},
-  {n:"Albertsons",                        ind:"Retail",                          rev:79000,  g:1},
-  {n:"Toyota Motor North America, Inc.",  ind:"Automotive",                      rev:129100, g:5},
-  {n:"Tesla, Inc.",                       ind:"Automotive",                      rev:94827,  g:13},
-  {n:"General Motors",                    ind:"Automotive",                      rev:185019, g:0},
-  {n:"Ford Motor Company",                ind:"Automotive",                      rev:187267, g:5},
-  {n:"Hyundai",                           ind:"Automotive",                      rev:128400, g:6},
-  {n:"Unilever PLC",                      ind:"CPG (Consumer Packaged Goods)",   rev:57126,  g:4},
-  {n:"P&G",                               ind:"CPG (Consumer Packaged Goods)",   rev:84300,  g:0},
-  {n:"Nestle",                            ind:"CPG (Consumer Packaged Goods)",   rev:107986, g:12},
-  {n:"L'Oreal",                           ind:"CPG (Consumer Packaged Goods)",   rev:49840,  g:3},
-  {n:"McDonald's Corporation",            ind:"CPG (Consumer Packaged Goods)",   rev:26885,  g:19},
-  {n:"Verizon Communications Inc.",       ind:"Telecom",                         rev:138191, g:-2},
-  {n:"AT&T Inc.",                         ind:"Telecom",                         rev:125600, g:2},
-  {n:"T-Mobile",                          ind:"Telecom",                         rev:71300,  g:4},
-  {n:"Comcast",                           ind:"Telecom",                         rev:123707, g:1},
-  {n:"Adobe Inc.",                        ind:"Hi-Tech",                         rev:23769,  g:-6},
-  {n:"Salesforce",                        ind:"Hi-Tech",                         rev:37895,  g:-3},
-  {n:"SAP",                               ind:"Hi-Tech",                         rev:36800,  g:7},
-  {n:"Samsung Electronics Co., Ltd.",     ind:"Semiconductor & Electronics",     rev:234622, g:11},
-  {n:"LG Electronics",                    ind:"Semiconductor & Electronics",     rev:62000,  g:5},
-  {n:"Intel",                             ind:"Semiconductor & Electronics",     rev:52900,  g:-2}
+  // Banking & Financial Services (8)
+  {n:"Bank of America Corporation",      ind:"Banking & Financial Services",    rev:113100,  g:5},
+  {n:"HSBC",                             ind:"Banking & Financial Services",    rev:68274,   g:2},
+  {n:"Visa Inc.",                        ind:"Banking & Financial Services",    rev:40000,   g:2},
+  {n:"Mastercard Incorporated",          ind:"Banking & Financial Services",    rev:32800,   g:6},
+  {n:"Goldman Sachs",                    ind:"Banking & Financial Services",    rev:58280,   g:7},
+  {n:"American Express",                 ind:"Banking & Financial Services",    rev:72200,   g:6},
+  {n:"Morgan Stanley",                   ind:"Banking & Financial Services",    rev:17900,   g:4},
+  {n:"BNP Paribas",                      ind:"Banking & Financial Services",    rev:56350,   g:3},
+  // Energy & Utilities (6)
+  {n:"Exxon Mobil Corporation",          ind:"Energy & Utilities",              rev:332238,  g:1},
+  {n:"Siemens Corporation",             ind:"Energy & Utilities",              rev:89263,   g:6},
+  {n:"Shell USA Inc.",                   ind:"Energy & Utilities",              rev:273700,  g:9},
+  {n:"Chevron",                          ind:"Energy & Utilities",              rev:184400,  g:1},
+  {n:"TotalEnergies",                    ind:"Energy & Utilities",              rev:182344,  g:1},
+  {n:"BP",                               ind:"Energy & Utilities",              rev:189335,  g:2},
+  // HLS (6)
+  {n:"Pfizer Inc.",                      ind:"HLS (Healthcare & Life Sciences)",rev:62579,   g:1},
+  {n:"AstraZeneca LP",                   ind:"HLS (Healthcare & Life Sciences)",rev:58739,   g:4},
+  {n:"Novartis AG",                      ind:"HLS (Healthcare & Life Sciences)",rev:54532,   g:5},
+  {n:"Roche",                            ind:"HLS (Healthcare & Life Sciences)",rev:72000,   g:2},
+  {n:"Merck & Co",                       ind:"HLS (Healthcare & Life Sciences)",rev:65000,   g:2},
+  {n:"Johnson & Johnson",                ind:"HLS (Healthcare & Life Sciences)",rev:94193,   g:4},
+  // Retail (5 — Walmart exception, base 2.5%)
+  {n:"Kroger Co., The",                  ind:"Retail",                          rev:147642,  g:5},
+  {n:"Walmart Inc.",                     ind:"Retail",                          rev:680985,  g:0,   base:.025},
+  {n:"Target",                           ind:"Retail",                          rev:106566,  g:2},
+  {n:"Albertsons",                       ind:"Retail",                          rev:79000,   g:1},
+  {n:"Costco",                           ind:"Retail",                          rev:275235,  g:5},
+  // Automotive (5 — Tesla exception)
+  {n:"Toyota Motor North America, Inc.", ind:"Automotive",                      rev:129100,  g:5},
+  {n:"Tesla, Inc.",                      ind:"Automotive",                      rev:94827,   g:13},
+  {n:"General Motors",                   ind:"Automotive",                      rev:185019,  g:0},
+  {n:"Ford Motor Company",               ind:"Automotive",                      rev:187267,  g:5},
+  {n:"Hyundai",                          ind:"Automotive",                      rev:128400,  g:6},
+  // CPG (5 — McDonald's exception)
+  {n:"Unilever PLC",                     ind:"CPG (Consumer Packaged Goods)",   rev:57126,   g:4},
+  {n:"P&G",                              ind:"CPG (Consumer Packaged Goods)",   rev:84300,   g:0},
+  {n:"Nestle",                           ind:"CPG (Consumer Packaged Goods)",   rev:107986,  g:12},
+  {n:"L'Oreal",                          ind:"CPG (Consumer Packaged Goods)",   rev:49840,   g:3},
+  {n:"McDonald's Corporation",           ind:"CPG (Consumer Packaged Goods)",   rev:26885,   g:19},
+  // Telecom (6)
+  {n:"Verizon Communications Inc.",      ind:"Telecom",                         rev:138191,  g:-2},
+  {n:"AT&T Inc.",                        ind:"Telecom",                         rev:125600,  g:2},
+  {n:"T-Mobile",                         ind:"Telecom",                         rev:71300,   g:4},
+  {n:"Comcast",                          ind:"Telecom",                         rev:123707,  g:1},
+  {n:"Vodafone",                         ind:"Telecom",                         rev:40230,   g:1},
+  {n:"BT Group",                         ind:"Telecom",                         rev:26200,   g:-1},
+  // Hi-Tech (5)
+  {n:"Adobe Inc.",                       ind:"Hi-Tech",                         rev:23769,   g:-6},
+  {n:"Salesforce",                       ind:"Hi-Tech",                         rev:37895,   g:-3},
+  {n:"SAP",                              ind:"Hi-Tech",                         rev:36800,   g:7},
+  {n:"Oracle",                           ind:"Hi-Tech",                         rev:57400,   g:-1},
+  {n:"Intuit",                           ind:"Hi-Tech",                         rev:18831,   g:-10},
+  // Semiconductor & Electronics (6 — Intel exception, base 5%)
+  {n:"Samsung Electronics Co., Ltd.",    ind:"Semiconductor & Electronics",     rev:234622,  g:11},
+  {n:"LG Electronics",                   ind:"Semiconductor & Electronics",     rev:62000,   g:5},
+  {n:"Intel",                            ind:"Semiconductor & Electronics",     rev:52900,   g:-2,  base:.05},
+  {n:"Sony Semiconductor Solutions",     ind:"Semiconductor & Electronics",     rev:14000,   g:0},
+  {n:"SK Hynix",                         ind:"Semiconductor & Electronics",     rev:66800,   g:8},
+  {n:"Micron",                           ind:"Semiconductor & Electronics",     rev:37380,   g:11},
+  // Insurance — indicative placeholder
+  {n:"Berkshire Hathaway",               ind:"Insurance",                       rev:371400,  g:2},
+  {n:"Prudential Financial",            ind:"Insurance",                       rev:70400,   g:-1},
+  {n:"MetLife",                          ind:"Insurance",                       rev:71000,   g:3},
+  {n:"AIG",                              ind:"Insurance",                       rev:27300,   g:2},
+  {n:"State Farm",                       ind:"Insurance",                       rev:123000,  g:0},
+  // RCM (Revenue Cycle Management) — indicative placeholder
+  {n:"Optum",                            ind:"RCM (Revenue Cycle Management)",  rev:253000,  g:1},
+  {n:"Omega Healthcare",                 ind:"RCM (Revenue Cycle Management)",  rev:200,     g:3},
+  {n:"GeBBS",                            ind:"RCM (Revenue Cycle Management)",  rev:400,     g:0},
+  {n:"Access Healthcare",               ind:"RCM (Revenue Cycle Management)",  rev:600,     g:5},
+  {n:"Waystar",                          ind:"RCM (Revenue Cycle Management)",  rev:910,     g:9},
+  // Media & Entertainment — indicative placeholder
+  {n:"The Walt Disney Company",          ind:"Media & Entertainment",           rev:91400,   g:8},
+  {n:"Warner Bros. Discovery",           ind:"Media & Entertainment",           rev:38900,   g:8},
+  {n:"Paramount",                        ind:"Media & Entertainment",           rev:29200,   g:3},
+  {n:"Netflix",                          ind:"Media & Entertainment",           rev:39000,   g:0},
+  {n:"Spotify",                          ind:"Media & Entertainment",           rev:15600,   g:9},
+  // Travel & Logistics — indicative placeholder
+  {n:"DHL Group",                        ind:"Travel & Logistics",              rev:90600,   g:4},
+  {n:"UPS",                              ind:"Travel & Logistics",              rev:91000,   g:3},
+  {n:"FedEx",                            ind:"Travel & Logistics",              rev:87700,   g:5},
+  {n:"A.P. Moller - Maersk",            ind:"Travel & Logistics",              rev:55500,   g:2},
+  {n:"XPO Logistics",                    ind:"Travel & Logistics",              rev:8100,    g:3},
 ];
 
 // ── State ──────────────────────────────────────────────────────────────────
@@ -409,11 +463,13 @@ function render() {
     const adjBmCls = r.adjBm>r.base?"pos":r.adjBm<r.base?"neg":"neu";
 
     let badge = "";
+    const isIndicativeInd = r.bm && r.bm.indicative;
     if(!r.isOriginal && r.isolated)  badge = "<span class='isolated-badge'>isolated avg</span>";
     else if(!r.isOriginal)           badge = "<span class='new-badge'>added</span>";
     else if(r.isException)           badge = "<span class='exception-badge'>exception</span>";
+    if(isIndicativeInd && r.isOriginal) badge += "<span class='indicative-badge'>indicative</span>";
 
-    const rowCls = r.isOriginal?(r.isException?"exception-co":""):"new-co";
+    const rowCls = !r.isOriginal ? "new-co" : r.isException ? "exception-co" : isIndicativeInd ? "indicative-co" : "";
 
     if(isEdit) {
       const baseEdit = (r.baseOverride!=null?r.baseOverride:r.bm.base)*100;
